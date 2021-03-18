@@ -33,7 +33,7 @@ namespace kjc {
 				}
 			}
 			reserve(n);
-			for (int i = 0; i < n; ++i) {
+			for (size_t = 0; i < n; ++i) {
 				start[i] = arr[i];
 			}
 			endOfStorange = finish = start + n;
