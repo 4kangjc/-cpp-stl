@@ -33,7 +33,7 @@ namespace kjc {
 				}
 			}
 			reserve(n);
-			for (size_t = 0; i < n; ++i) {
+			for (size_t i = 0; i < n; ++i) {
 				start[i] = arr[i];
 			}
 			endOfStorange = finish = start + n;
@@ -43,11 +43,8 @@ namespace kjc {
 				return *this;
 			}
 			size_t n = arr.size();
-			if (this->size() < n) {
-				delete[] start;
-				start = new T[n];
-			}
-			for (int i = 0; i < n; ++i) {
+			reserve(n);
+			for (size_t i = 0; i < n; ++i) {
 				start[i] = arr[i];
 			}
 			endOfStorange = finish = start + n;
@@ -56,25 +53,25 @@ namespace kjc {
 			clear();
 			::operator delete(start, cap() * sizeof(value_type));
 			//delete[] start;
-			//start = finish = end_of_storange = nullptr;
+			start = finish = endOfStorange = nullptr;
 		}
 	public:
 		void reserve(size_t newCapacity);
 		reference operator[] (size_t index) {
 			return start[index];
 		}
-		const reference operator[] (size_t index) const {
+		const_reference operator[] (size_t index) const {
 			return start[index];
 		}
 		size_t size() const { return size_t(finish - start); }
 		size_t cap() const { return size_t(endOfStorange - start); }
 		iterator begin() { return start; }
 		iterator end() { return finish; }
-		const_pointer cbegin() const { return start; }
-		const_pointer cend() const { return finish; }
+		const_reference cbegin() const { return (const_reference)start; }
+		const_reference cend() const { return (const_reference)finish; }
 		bool empty() const { return size() == 0; }
 		reference front() { return *begin(); }
-		const_reference front() const { return (const_reference)*cbegin(); }
+		const_reference front() const { return *cbegin(); }
 		reference back() { return *(end() - 1); }
 		const_reference back() const { return *(cend() - 1); }
 	public:
@@ -135,7 +132,8 @@ namespace kjc {
 		if (finish == endOfStorange) {
 			ReAlloc(2 * size());
 		}
-		*finish = std::move(x);
+		//*finish = std::move(x);
+		new(finish) T(std::move(x));
 		finish++;
 	}
 	template<typename T>
@@ -169,10 +167,11 @@ namespace kjc {
 	}
 	template<typename T>
 	void ArrayList<T>::clear() {
-		while (start != finish) {
-			start->~T();
-			++start;
+		auto temp = start;
+		while (temp != finish) {
+			temp->~T();
+			++temp;
 		}
-		start = finish = endOfStorange = nullptr;
+		finish = start;
 	}
 }
