@@ -37,6 +37,7 @@ namespace kjc {
 				start[i] = arr[i];
 			}
 			endOfStorange = finish = start + n;
+			return *this;
 		}
 		ArrayList<T>& operator=(const ArrayList<T>& arr) {
 			if (this == &arr) {
