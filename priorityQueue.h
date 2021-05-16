@@ -72,3 +72,59 @@ namespace kjc {
 		}
 	};
 }
+
+/* 支持删除操作的优先队列 */
+#pragma once
+#include<vector>
+#include<functional>
+#include <queue>
+#pragma once
+namespace std {
+	template<typename T, typename Container = std::vector<T>, class Pr = std::less<T>>
+	class priorityQueue {
+	public:
+		using value_type = T;
+		using reference = T&;
+		using const_reference = typename Container::const_reference;
+		//using size_type = typename Container::size_type;
+		using container_type = Container;
+		using value_compare = Pr;
+
+		priorityQueue() = default;
+		priorityQueue(container_type& c) : q1(c.begin(), c.end()) {}
+	private:
+		priority_queue<T, Container, Pr> q1, q2;
+
+	public:
+		inline bool empty() const { return size() == 0; }
+		inline size_t size() const { return q1.size() - q2.size(); }
+		void push(const value_type& v) {
+			q1.push(v);
+		}
+		void push(value_type&& v) {
+			q1.push(std::move(v));
+		}
+		template<typename... Valty>
+		void emplace(Valty&&... Val) {
+			q1.emplace(std::forward<Valty>(Val)...);
+		}
+		const_reference top() {
+			while (q1.size() && q2.size() && q1.top() == q2.top())	q1.pop(), q2.pop();
+			if (q1.empty()) {
+				return -1;
+			}
+			return q1.top();
+		}
+		decltype(auto) pop() {
+			const auto value = top();
+			q1.pop();
+			return value;
+		}
+		void erase(const T& value) noexcept {
+			q2.push(value);
+		}
+		void erase(T&& value) noexcept {
+			q2.push(std::move(value));
+		}
+	};
+}
